@@ -63,6 +63,14 @@ public class FixedDeadZoneCamera : MonoBehaviour
     [Tooltip("锚点滑动的速度（应快于 followSpeed，产生镜头滞后感）")]
     public float anchorSpeed = 6f;
 
+    [Header("船上模式")]
+    [Tooltip("上船后相机高度的倍率（>1 = 拉高看得更远）")]
+    public float boatHeightMultiplier = 1.6f;
+    [Tooltip("上船后死区半径的倍率（>1 = 死区变大不容易晃）")]
+    public float boatDeadZoneMultiplier = 1.5f;
+    [Tooltip("上船后跟随速度的倍率")]
+    public float boatFollowSpeedMultiplier = 1.3f;
+
     // ——— 运行时状态 ———
     private Vector3 _anchor;                // 地面锚点（决定相机位置的参考点）
     private Vector3 _cameraTargetPosition;  // 相机目标位置
@@ -72,6 +80,11 @@ public class FixedDeadZoneCamera : MonoBehaviour
     // 缓存：每次 LateUpdate 计算的屏幕中心地面点
     private Vector3 _screenCenterGround;
 
+    // 船上模式：运行时原始值的备份
+    private float _originalHeight;
+    private float _originalDeadZoneRadius;
+    private float _originalFollowSpeed;
+
     private void Start()
     {
         if (player == null)
@@ -80,6 +93,11 @@ public class FixedDeadZoneCamera : MonoBehaviour
             enabled = false;
             return;
         }
+
+        // 保存原始参数，用于船上模式切换
+        _originalHeight = height;
+        _originalDeadZoneRadius = deadZoneRadius;
+        _originalFollowSpeed = followSpeed;
 
         switch (initMode)
         {
@@ -193,6 +211,34 @@ public class FixedDeadZoneCamera : MonoBehaviour
     // ════════════════════════════════════════
     //  工具方法
     // ════════════════════════════════════════
+
+    /// <summary>
+    /// 切换船上/陆地模式。InteractableBoat 在上/下船时调用。
+    /// 直接修改运行时值，兼容 FromParameters 和 UseSceneTransform 两种初始化模式。
+    /// </summary>
+    public void SetBoatMode(bool isBoat)
+    {
+        if (isBoat)
+        {
+            _originalHeight = _runtimeHeight;
+            _originalDeadZoneRadius = deadZoneRadius;
+            _originalFollowSpeed = followSpeed;
+
+            _runtimeHeight *= boatHeightMultiplier;
+            deadZoneRadius *= boatDeadZoneMultiplier;
+            followSpeed *= boatFollowSpeedMultiplier;
+
+            Debug.Log("📷 切换为船上视角 (高度 " + _runtimeHeight.ToString("F1") + ")");
+        }
+        else
+        {
+            _runtimeHeight = _originalHeight;
+            deadZoneRadius = _originalDeadZoneRadius;
+            followSpeed = _originalFollowSpeed;
+
+            Debug.Log("📷 切换为陆地视角 (高度 " + _runtimeHeight.ToString("F1") + ")");
+        }
+    }
 
     private static Vector3 Flatten(Vector3 v)
     {
