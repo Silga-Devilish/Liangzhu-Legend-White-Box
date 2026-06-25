@@ -57,6 +57,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _SSSMap:
+        m_Texture: {fileID: 2800000, guid: 405557c55f4cca2438ce5401c606d16c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _thickness:
         m_Texture: {fileID: 2800000, guid: 7bb4cce0f781abd47934e407e46503d3, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -88,6 +92,8 @@ Material:
     - _SSSNormalPerturbation: 0.96
     - _SSSPower: 1.59
     - _SSSscale: 1.24
+    - _ThicknessPower: 0
+    - _ThicknessScale: 0
     - _scale: 0.44
     m_Colors:
     - _BaseColor: {r: 0, g: 1, b: 0.9687028, a: 1}
